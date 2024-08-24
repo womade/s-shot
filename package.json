@@ -1,0 +1,18 @@
+{
+  "name": "s-shot",
+  "version": "1.0.0",
+  "description": "使用 puppeteer 进行网站截图 并返回",
+  "main": "app.js",
+  "author": "Y-ZHENG",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "puppeteer": "^21.0.1"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
