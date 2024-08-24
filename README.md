@@ -30,8 +30,18 @@ t: 等待时长（秒）
 
 ### 2.docker环境使用(推荐)
 
-使用docker构建容器（注意的是映射端口，服务启动在容器的3030端口，需要映射到本地），具体查看 **[build-container.cmd](https://github.com/womade/s-shot/blob/main/build-container.cmd)** 文件)。
+#### 构建DOCKER镜像
 
-docker buildx create --name multi-platform --use --platform linux/arm,linux/arm64,linux/amd64 --driver docker-container
+```
+docker buildx create --name multi-platform --use --platform linux/arm64,linux/amd64 --driver docker-container
 
-docker buildx build -t womade/s-shot --platform linux/arm,linux/arm64,linux/amd64 . --push
+docker buildx build --platform linux/amd64,linux/arm64 -t womade/s-shot --push .
+```
+
+#### 通过在线镜像安装
+
+```
+docker run -d --restart=always --net=host --name S-SHOT womade/s-shot
+```
+
+
