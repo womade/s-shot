@@ -1,5 +1,5 @@
 # 使用指定的 Node.js 版本 16.19.1 镜像作为基础镜像
-FROM node:20.17.0
+FROM node:16.19.1
 
 # 设置容器内的工作目录
 WORKDIR /usr/src/app/s-shot
