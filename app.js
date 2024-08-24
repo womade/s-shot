@@ -5,7 +5,7 @@ const fs = require('fs');
 const util = require('util');
 
 const app = express();
-const port = process.env.PORT || 3030; // 使用环境变量或默认值
+const port = 3030;
 
 // 将 fs.mkdir() 转换为返回 Promise 的函数
 const mkdir = util.promisify(fs.mkdir);
@@ -14,34 +14,6 @@ const mkdir = util.promisify(fs.mkdir);
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-// 清理过期截图的异步函数
-async function cleanUpScreenshots() {
-  const directoryPath = path.join(__dirname, 'screenshot');
-
-  if (!fs.existsSync(directoryPath)) {
-    return; // 如果目录不存在，则直接返回
-  }
-
-  const files = await fs.promises.readdir(directoryPath);
-
-  for (const file of files) {
-    const filePath = path.join(directoryPath, file);
-    const fileStat = await fs.promises.stat(filePath);
-
-    const lastModified = fileStat.mtime;
-    const now = new Date();
-    const timeDiffInSeconds = Math.floor((now - lastModified) / 1000);
-
-    if (timeDiffInSeconds > 24 * 60 * 60) {
-      await fs.promises.unlink(filePath);
-      console.log(`Deleted old file: ${filePath}`);
-    }
-  }
-}
-
-// 定期执行清理任务
-setInterval(cleanUpScreenshots, 24 * 60 * 60 * 1000); // 每24小时执行一次
 
 app.get('/screenshot', async (req, res) => {
   try {
@@ -55,7 +27,7 @@ app.get('/screenshot', async (req, res) => {
     });
 
     // m 支持 = file 直接返回截图文件
-    const { url = 'https://i.ssss.fun', w: width = 1920, h: height = 1080, m = 'json', t: delaySec = 10 } = req.query;
+    const { url = 'https://i.ssss.fun', w: width = 1920, h: height = 1080, m = 'json', t: delaySec = 5 } = req.query;
 
     // 创建一个新页面
     const page = await browser.newPage();
