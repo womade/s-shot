@@ -10,9 +10,9 @@
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "puppeteer": "^latest"
+    "puppeteer": "^23.1.1"
   },
   "dependencies": {
-    "express": "^latest"
+    "express": "^4.19.2"
   }
 }
