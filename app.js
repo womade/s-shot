@@ -5,7 +5,7 @@ const fs = require('fs');
 const util = require('util');
 
 const app = express();
-const port = 3030;
+const port = process.env.PORT || 3030; // 使用环境变量或默认值
 
 // 将 fs.mkdir() 转换为返回 Promise 的函数
 const mkdir = util.promisify(fs.mkdir);
@@ -15,7 +15,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 清理过期截图的函数
+// 清理过期截图的异步函数
 async function cleanUpScreenshots() {
   const directoryPath = path.join(__dirname, 'screenshot');
 
@@ -23,34 +23,25 @@ async function cleanUpScreenshots() {
     return; // 如果目录不存在，则直接返回
   }
 
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      console.error('Unable to scan the directory: ' + err);
-      return;
+  const files = await fs.promises.readdir(directoryPath);
+
+  for (const file of files) {
+    const filePath = path.join(directoryPath, file);
+    const fileStat = await fs.promises.stat(filePath);
+
+    const lastModified = fileStat.mtime;
+    const now = new Date();
+    const timeDiffInSeconds = Math.floor((now - lastModified) / 1000);
+
+    if (timeDiffInSeconds > 24 * 60 * 60) {
+      await fs.promises.unlink(filePath);
+      console.log(`Deleted old file: ${filePath}`);
     }
+  }
+}
 
-    // 遍历所有文件
-    files.forEach(file => {
-      const filePath = path.join(directoryPath, file);
-      const fileStat = fs.statSync(filePath);
-
-      // 获取文件的最后修改时间
-      const lastModified = fileStat.mtime;
-      const now = new Date();
-      const timeDiffInSeconds = Math.floor((now - lastModified) / 1000);
-
-      // 检查文件是否超过24小时
-      if (timeDiffInSeconds > 24 * 60 * 60) {
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error('Error deleting file: ' + err);
-          } else {
-            console.log(`Deleted old file: ${filePath}`);
-          }
-        });
-      }
-    });
-  });
+// 定期执行清理任务
+setInterval(cleanUpScreenshots, 24 * 60 * 60 * 1000); // 每24小时执行一次
 
 app.get('/screenshot', async (req, res) => {
   try {
